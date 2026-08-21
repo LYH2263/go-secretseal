@@ -1,0 +1,8 @@
+body{font-family:Segoe UI,sans-serif;margin:0;background:#101820;color:#e8eef4}
+header{padding:1.2rem 1.5rem;background:#1a2430}
+main{display:grid;grid-template-columns:1fr 1fr;gap:1rem;padding:1rem 1.5rem}
+section{background:#1a2430;padding:1rem;border-radius:8px}
+pre{font-size:12px;white-space:pre-wrap;word-break:break-all}
+label{display:block;margin:.4rem 0}
+input{width:90%}
+button{margin:.3rem .3rem 0 0}
