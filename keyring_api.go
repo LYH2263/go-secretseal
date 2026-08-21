@@ -34,10 +34,17 @@ func (b *Box) Add(id, label string, material []byte) error {
 	if err := b.ring.Add(e); err != nil {
 		return ErrInvalid
 	}
-	if b.ring.ActiveID() == "" {
+	// 仅当环内尚无 active 时才提升新密钥；落盘失败必须回滚这次提升，
+	// 否则 active 会指向未持久化的密钥，内存与磁盘状态撕裂。
+	setActive := b.ring.ActiveID() == ""
+	if setActive {
 		b.ring.SetActive(id)
 	}
-	return b.persistLocked()
+	if err := b.persistLocked(); err != nil {
+		b.ring.Remove(id)
+		return err
+	}
+	return nil
 }
 
 func (b *Box) ListKeys() []KeyView {

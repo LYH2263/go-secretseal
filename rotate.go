@@ -35,12 +35,16 @@ func (b *Box) RotateContext(ctx context.Context, newID, label string, material [
 		ID: newID, Label: label, Material: mat, Salt: salt,
 		Meta: []string{"rotated"}, CreatedAt: time.Now().UTC(),
 	}
+	// 记住切换前的状态，落盘失败时原样回滚，避免 active 指向
+	// 未持久化的新密钥造成内存与磁盘状态撕裂。
+	prevActive := b.ring.ActiveID()
 	if err := b.ring.Add(e); err != nil {
 		return ErrInvalid
 	}
 	b.ring.SetActive(newID)
 	if err := b.persistLocked(); err != nil {
-
+		b.ring.SetActive(prevActive)
+		_ = b.ring.Remove(newID)
 		return err
 	}
 	b.metrics.IncRotated()

@@ -15,7 +15,7 @@ func (b *Box) persistLocked() error {
 		Entries: append([]keyring.Entry(nil), entries...),
 	}
 	if err := b.persist.Save(snap); err != nil {
-		return nil
+		return wrapPersist(err)
 	}
 	return nil
 }
