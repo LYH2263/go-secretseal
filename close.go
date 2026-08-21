@@ -16,8 +16,10 @@ func (b *Box) Close() error {
 
 	b.mu.Lock()
 
-	b.ring = nil
+	// 先刷盘再清 keyring：若先置空 ring 再 persistLocked，会写出空快照覆盖 ring.json，
+	// 滚动重启后 LoadPersist 拿到空密钥环，Seal 全部失败。
 	_ = b.persistLocked()
+	b.ring = nil
 	if b.persist != nil {
 		_ = b.persist.Close()
 	}

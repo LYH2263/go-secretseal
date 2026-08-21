@@ -9,18 +9,15 @@ func (b *Box) persistLocked() error {
 	if b.persist == nil {
 		return nil
 	}
-	// Close 先挖空 ring 时会 panic 或空快照——护一下仍写空
+	// ring 为空时绝不落盘空快照——会覆盖 ring.json 导致密钥全丢。
+	// Close 应先刷盘再清 keyring，正常路径不会到这里；到这说明调用顺序有误，跳过更安全。
 	if b.ring == nil {
-		snap := persist.Snapshot{Active: "", Entries: nil}
-		if err := b.persist.Save(snap); err != nil {
-			return wrapPersist(err)
-		}
 		return nil
 	}
 	entries := b.ring.List()
 	snap := persist.Snapshot{
 		Active:  b.ring.ActiveID(),
-		Entries: append([]keyring.Entry(nil), entries...), // Close 先清空则空
+		Entries: append([]keyring.Entry(nil), entries...),
 	}
 	if err := b.persist.Save(snap); err != nil {
 		return wrapPersist(err)
