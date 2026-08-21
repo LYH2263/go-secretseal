@@ -67,9 +67,12 @@ func (s *Store) Load() (Snapshot, error) {
 func (s *Store) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-
+	if s.f == nil {
+		return nil
+	}
+	err := s.f.Close()
 	s.f = nil
-	return nil
+	return err
 }
 
 func (s *Store) Path() string { return s.path }
