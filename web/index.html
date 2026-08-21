@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><title>secretseal</title><link rel="stylesheet" href="style.css"/></head>
+<body><header><h1>信封加密密封盒</h1><p>seald · :8104</p></header>
+<main>
+<section><h2>密钥环</h2><button id="r">刷新</button><pre id="k"></pre></section>
+<section><h2>试密封</h2>
+<label>AAD <input id="aad" value="meta"/></label>
+<label>明文 <input id="plain" value="hello"/></label>
+<button id="seal">Seal</button>
+<pre id="blob"></pre>
+<button id="open">Open</button>
+<pre id="out"></pre>
+</section>
+<section><h2>统计</h2><pre id="s"></pre></section>
+</main>
+<script src="app.js"></script></body></html>
