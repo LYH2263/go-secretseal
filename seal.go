@@ -24,6 +24,9 @@ func (b *Box) SealContext(ctx context.Context, aad, plain []byte) (Blob, error) 
 	if b.closed {
 		return Blob{}, ErrClosed
 	}
+	if b.fac == nil {
+		return Blob{}, ErrNoCipher
+	}
 
 	if plain == nil {
 		return Blob{}, ErrInvalid
