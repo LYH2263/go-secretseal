@@ -2,10 +2,12 @@ package secretseal
 
 import (
 	"context"
+	"time"
 
 	"example.com/secretseal/internal/blob"
 	"example.com/secretseal/internal/clone"
 	"example.com/secretseal/internal/dek"
+	"example.com/secretseal/internal/wait"
 )
 
 func (b *Box) Seal(aad, plain []byte) (Blob, error) {
@@ -13,7 +15,16 @@ func (b *Box) Seal(aad, plain []byte) (Blob, error) {
 }
 
 func (b *Box) SealContext(ctx context.Context, aad, plain []byte) (Blob, error) {
-
+	if err := ctx.Err(); err != nil {
+		return Blob{}, wrapCancel(err)
+	}
+	if err := b.pol.WaitSeal(ctx); err != nil {
+		return Blob{}, wrapCancel(err)
+	}
+	// 可选短等待（测试可取消）
+	if err := wait.Context(ctx, time.Millisecond); err != nil {
+		return Blob{}, wrapCancel(err)
+	}
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	if b.closed {
